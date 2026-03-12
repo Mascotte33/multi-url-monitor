@@ -1,0 +1,8 @@
+URL: https://10.255.255.1 
+ INFO: 0 
+ WARNING: 0 
+ ERROR 3 
+ Avarage response time: None 
+
+ALERT: Too many errors on https://10.255.255.1 
+
