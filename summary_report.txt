@@ -1,8 +1,24 @@
-URL: https://10.255.255.1 
- INFO: 0 
+URL: https://google.com 
+ INFO: 3 
  WARNING: 0 
- ERROR 3 
- Avarage response time: None 
+ ERROR 0 
+ Average response time: 0.60s 
 
-ALERT: Too many errors on https://10.255.255.1 
+URL: https://youtube.com 
+ INFO: 3 
+ WARNING: 0 
+ ERROR 0 
+ Average response time: 0.77s 
+
+URL: https://facebook.com 
+ INFO: 2 
+ WARNING: 1 
+ ERROR 0 
+ Average response time: 1.07s 
+
+URL: https://twitter.com 
+ INFO: 1 
+ WARNING: 2 
+ ERROR 0 
+ Average response time: 1.07s 
 
