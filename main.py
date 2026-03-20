@@ -1,4 +1,5 @@
 import re
+import os
 import time
 import datetime
 import requests
@@ -9,10 +10,12 @@ from dominate import document
 from dominate.tags import *
 
 
-url_list = ["https://google.com",
-            "https://youtube.com",
-            "https://facebook.com",
-            "https://twitter.com",]
+# url_list = ["https://google.com",
+#             "https://youtube.com",
+#             "https://facebook.com",
+#             "https://twitter.com",]
+
+
 
 
 def check_url(url):
@@ -92,9 +95,9 @@ def generate_summary(log_data):
         stats = calculate_stats(results)
 
         with open("summary_report.txt", "a") as summary_file:
-            if stats['average_duration'] != 0:
+            if stats["average_duration"] != None:
                 summary_file.write(
-                    f"URL: {url} \n INFO: {stats['info']} \n WARNING: {stats['warning']} \n ERROR {stats['error']} \n Average response time: {(stats['average_duration']):.2f}s \n\n"
+                    f"URL: {url} \n INFO: {stats["info"]} \n WARNING: {stats['warning']} \n ERROR {stats['error']} \n Average response time: {(stats['average_duration']):.2f}s \n\n"
                 )
             else:
                 summary_file.write(
@@ -191,14 +194,18 @@ def generate_html_report(log_data):
 
             file_name = re.sub(r'[^a-zA-Z0-9\s]', '', url).strip()
             file_name = file_name[5:]
-            chart_path = f'{file_name}.png'
+            chart_path = f'plots/{file_name}.png'
 
             with div(_class='report'):
                 p(f'URL: {url}')
                 p(f'INFO: {stats['info']}')
                 p(f'WARNING: {stats['warning']}')
                 p(f'ERROR: {stats['error']}')
-                p(f'Average response time {(stats['average_duration']):.2f}')
+                if stats['average_duration'] != None:
+                    p(f'Average response time {(stats['average_duration']):.2f}')
+                else:
+                    p(f'Did not connect')
+
 
                 if chart_path:
                     h2('Response Time Chart')
@@ -210,6 +217,14 @@ def generate_html_report(log_data):
 
 
 if __name__ == "__main__":
+
+    urls = os.getenv("URLS")
+    if urls:
+        url_list = urls.split(",")
+    elif not urls:    
+        print("No URLs provided!")
+        exit(1)
+
     clear_files()
     log_data = run_monitor(url_list)
     generate_summary(log_data)

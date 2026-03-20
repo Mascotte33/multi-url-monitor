@@ -1,0 +1,16 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated logs and reports
+health_check.log
+summary_report.txt
+summary_report.html
+plots/
+
+# VS Code settings
+.vscode/
+
+# OS temp files
+.DS_Store
+Thumbs.db

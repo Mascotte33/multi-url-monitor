@@ -1,0 +1,11 @@
+services:
+  app:
+    # nazwa kontenera / serwisu
+    build: . # buduj z Dockerfile w aktualnym folderze
+    container_name: url-monitor
+    volumes:
+      - .:/app # mount folderu lokalnego do kontenera
+    env_file:
+      #dodaje sobie zmienne "linki" do enviroment
+      - .env
+    command: python main.py
