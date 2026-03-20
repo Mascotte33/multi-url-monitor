@@ -1,0 +1,9 @@
+plots/
+health_check.log
+summary_report.txt
+summary_report.html
+__pycache__/
+*.pyc
+*.log
+.git
+.env
