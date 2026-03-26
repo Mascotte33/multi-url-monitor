@@ -1,3 +1,4 @@
+import logging
 import re
 import os
 import time
@@ -7,15 +8,8 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 from collections import defaultdict
 from dominate import document
+from dotenv import load_dotenv
 from dominate.tags import *
-
-
-# url_list = ["https://google.com",
-#             "https://youtube.com",
-#             "https://facebook.com",
-#             "https://twitter.com",]
-
-
 
 
 def check_url(url):
@@ -57,18 +51,18 @@ def log_level(response):
         return "INFO"
     elif response['status'] == 200 and response['duration'] >= 1:
         return "WARNING"
-    elif response["status"] != 200 or 'Exception' in response['error']:
+    elif response['status'] != 200 or 'Exception' in response['error']:
         return "ERROR"
 
 
 def log_result(response, level, url):
-    with open("health_check.log", "a") as log_file:
+    with open(OUTPUT_DIR/"health_check.log", "a") as log_file:
         if response['status'] == None:
             log_file.write(
                 f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['error']} \n")
         else:
             log_file.write(
-                f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['status']} Response time: {response["duration"]:.2f}s \n")
+                f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['status']} Response time: {response['duration']:.2f}s \n")
 
 
 def run_monitor(url_list):
@@ -90,14 +84,14 @@ def run_monitor(url_list):
 
 
 def generate_summary(log_data):
+    with open(OUTPUT_DIR/'summary_report.txt', "w") as summary_file:
 
-    for url, results in log_data.items():
-        stats = calculate_stats(results)
-
-        with open("summary_report.txt", "a") as summary_file:
-            if stats["average_duration"] != None:
+        for url, results in log_data.items():
+            stats = calculate_stats(results)
+        
+            if stats['average_duration'] != None:
                 summary_file.write(
-                    f"URL: {url} \n INFO: {stats["info"]} \n WARNING: {stats['warning']} \n ERROR {stats['error']} \n Average response time: {(stats['average_duration']):.2f}s \n\n"
+                    f"URL: {url} \n INFO: {stats['info']} \n WARNING: {stats['warning']} \n ERROR {stats['error']} \n Average response time: {(stats['average_duration']):.2f}s \n\n"
                 )
             else:
                 summary_file.write(
@@ -128,7 +122,7 @@ def plot_response_times(log_data):
 
         file_name = re.sub(r'[^a-zA-Z0-9\s]', '', url).strip()
         file_name = file_name[5:]
-        folder = Path("plots")
+        folder = Path(OUTPUT_DIR/"plots")
         folder.mkdir(parents=True, exist_ok=True)
 
         plt.bar(x_tries, y_duration, color='steelblue',
@@ -137,7 +131,7 @@ def plot_response_times(log_data):
         plt.xlabel("Number of tries")
         plt.ylabel("Time to respond in s")
         plt.title(f"Response time for {url}")
-        plt.savefig(f'plots/{file_name}.png', dpi=fig.dpi)
+        plt.savefig(OUTPUT_DIR/f'plots/{file_name}.png', dpi=fig.dpi)
         plt.clf()
         plt.close()
 
@@ -146,9 +140,9 @@ def plot_response_times(log_data):
 
 
 def clear_files():
-    open("health_check.log", "w").close()
-    open("summary_report.txt", "w").close()
-    open("summary_report.html", "w").close()
+    open(OUTPUT_DIR/"health_check.log", "w").close()
+    open(OUTPUT_DIR/"summary_report.txt", "w").close()
+    open(OUTPUT_DIR/"summary_report.html", "w").close()
 
 
 def calculate_stats(results):
@@ -184,10 +178,9 @@ def calculate_stats(results):
 
 
 def generate_html_report(log_data):
-    charts_iterator = 0
 
     with document(title='summary_report') as doc:
-        h1('URL Monitoring Report')
+        h1(f'URL Monitoring Report for {datetime.datetime.now():%Y-%m-%d_%H:%M:%S}')
 
         for url, results in log_data.items():
             stats = calculate_stats(results)
@@ -207,26 +200,42 @@ def generate_html_report(log_data):
                     p(f'Did not connect')
 
 
-                if chart_path:
+                if os.path.exists(OUTPUT_DIR/f"{chart_path}"):
                     h2('Response Time Chart')
                     img(src=chart_path)
-                    charts_iterator += 1
 
-    with open('summary_report.html', 'a') as summary_report:
+    with open(OUTPUT_DIR/"summary_report.html", 'w') as summary_report:
         summary_report.write(doc.render())
 
 
 if __name__ == "__main__":
 
+    OUTPUT_DIR = Path("output")
+    OUTPUT_DIR.mkdir(parents=True,exist_ok=True)
+
+    load_dotenv('.env') #dzieki temu moge sie dostac do zmiennych w .env
+
+    env_interval = os.getenv("INTERVAL")
+    if env_interval == None:
+        logging("NO INTERVAL EXIT")
+        exit(1)
+    else:
+        interval = int(env_interval)
+
     urls = os.getenv("URLS")
     if urls:
         url_list = urls.split(",")
-    elif not urls:    
-        print("No URLs provided!")
+    elif not urls:   
+        logging("No URLs provided!")
         exit(1)
 
     clear_files()
-    log_data = run_monitor(url_list)
-    generate_summary(log_data)
-    plot_response_times(log_data)
-    generate_html_report(log_data)
+
+    while True:
+        logging("Starting monitoring cycle..")
+        log_data = run_monitor(url_list)
+        generate_summary(log_data)
+        plot_response_times(log_data)
+        generate_html_report(log_data)
+        logging(f"Sleeping for {interval}s")
+        time.sleep(interval)

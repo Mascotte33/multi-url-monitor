@@ -6,6 +6,16 @@ services:
     volumes:
       - .:/app # mount folderu lokalnego do kontenera
     env_file:
-      #dodaje sobie zmienne "linki" do enviroment
+      #plik ktory ma w sobie env variables
       - .env
+    environment:
+      URLS: ${URLS}
+      INTERVAL: ${INTERVAL}
     command: python main.py
+  web:
+    image: nginx:alpine
+    container_name: nginx-server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./output:/usr/share/nginx/html
