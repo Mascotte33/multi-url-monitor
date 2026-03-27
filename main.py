@@ -4,12 +4,14 @@ import os
 import time
 import datetime
 import requests
+import boto3
 from matplotlib import pyplot as plt
 from pathlib import Path
 from collections import defaultdict
 from dominate import document
 from dotenv import load_dotenv
 from dominate.tags import *
+
 
 
 def check_url(url):
@@ -21,7 +23,7 @@ def check_url(url):
         return {
             "status": response.status_code,
             "duration": duration,
-            "error": "None"
+            "error": None
         }
 
     except requests.exceptions.Timeout as timeout_exception:
@@ -208,7 +210,25 @@ def generate_html_report(log_data):
         summary_report.write(doc.render())
 
 
+def upload_to_s3(local_path, s3_path):    
+    try:
+        s3_client.upload_file(str(local_path), bucket_name, s3_path)
+        logging.info(f"Uploaded {local_path} to s3://{bucket_name}/{s3_path}")
+    except Exception as e:
+        logging.error(f"Failed to upload the file. {e}")
+
+
 if __name__ == "__main__":
+
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY"),
+        region_name = os.getenv("AWS_REGION")        
+    )
+    bucket_name = os.getenv("S3_BUCKET_NAME")
+
+    logging.basicConfig(level=logging.INFO)  #basicowa konfiguracja logging. bo z defaultu logging nie pokazuje"info"
 
     OUTPUT_DIR = Path("output")
     OUTPUT_DIR.mkdir(parents=True,exist_ok=True)
@@ -217,7 +237,7 @@ if __name__ == "__main__":
 
     env_interval = os.getenv("INTERVAL")
     if env_interval == None:
-        logging("NO INTERVAL EXIT")
+        logging.info("NO INTERVAL EXIT")
         exit(1)
     else:
         interval = int(env_interval)
@@ -226,16 +246,27 @@ if __name__ == "__main__":
     if urls:
         url_list = urls.split(",")
     elif not urls:   
-        logging("No URLs provided!")
+        logging.info("No URLs provided!")
         exit(1)
 
     clear_files()
 
     while True:
-        logging("Starting monitoring cycle..")
-        log_data = run_monitor(url_list)
-        generate_summary(log_data)
-        plot_response_times(log_data)
-        generate_html_report(log_data)
-        logging(f"Sleeping for {interval}s")
-        time.sleep(interval)
+        try:
+            logging.info("Starting monitoring cycle..")        
+            log_data = run_monitor(url_list)
+            generate_summary(log_data)
+            plot_response_times(log_data)
+            generate_html_report(log_data)
+
+            for file_path in OUTPUT_DIR.rglob("*"):
+                if file_path.is_file():
+                    relative_path = file_path.relative_to(OUTPUT_DIR)
+                    upload_to_s3(file_path, str(relative_path))
+
+            logging.info(f"Sleeping for {interval}s")
+            time.sleep(interval)
+        except Exception as e:
+            logging.error(f"Cycle failed {e}")
+
+    
