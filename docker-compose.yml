@@ -12,6 +12,7 @@ services:
       URLS: ${URLS}
       INTERVAL: ${INTERVAL}
     command: python main.py
+    restart: always
   web:
     image: nginx:alpine
     container_name: nginx-server
@@ -19,3 +20,4 @@ services:
       - "8080:80"
     volumes:
       - ./output:/usr/share/nginx/html
+    restart: always

@@ -1,6 +1,7 @@
 import logging
 import re
 import os
+import sys
 import time
 import datetime
 import requests
@@ -238,7 +239,7 @@ if __name__ == "__main__":
     env_interval = os.getenv("INTERVAL")
     if env_interval == None:
         logging.info("NO INTERVAL EXIT")
-        exit(1)
+        sys.exit(1)
     else:
         interval = int(env_interval)
 
@@ -247,7 +248,7 @@ if __name__ == "__main__":
         url_list = urls.split(",")
     elif not urls:   
         logging.info("No URLs provided!")
-        exit(1)
+        sys.exit(1)
 
     clear_files()
 
@@ -265,7 +266,8 @@ if __name__ == "__main__":
                     upload_to_s3(file_path, str(relative_path))
 
             logging.info(f"Sleeping for {interval}s")
-            time.sleep(interval)
+            # time.sleep(interval)
+            time.sleep(600) #For testing only
         except Exception as e:
             logging.error(f"Cycle failed {e}")
 
