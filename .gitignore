@@ -1,7 +1,6 @@
 # Python cache
 __pycache__/
 *.pyc
-.env
 # Generated logs and reports
 health_check.log
 summary_report.txt
@@ -14,3 +13,7 @@ plots/
 # OS temp files
 .DS_Store
 Thumbs.db
+
+#Other
+.env
+minikube-linux-amd64

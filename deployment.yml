@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url-monitor
+
+  template:
+    metadata:
+      labels:
+        app: url-monitor
+
+    spec:
+      containers:
+        - name: url-monitor
+          image: url-monitor:latest
+          imagePullPolicy: IfNotPresent
+
+          envFrom:
+            - secretRef:
+                name: url-monitor-secret
+
+          livenessProbe:
+            exec:
+              command: ["echo", "ok"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
