@@ -12,7 +12,7 @@ from collections import defaultdict
 from dominate import document
 from dotenv import load_dotenv
 from dominate.tags import *
-
+from flask import Flask
 
 
 def check_url(url):
@@ -218,8 +218,31 @@ def upload_to_s3(local_path, s3_path):
     except Exception as e:
         logging.error(f"Failed to upload the file. {e}")
 
+app = Flask(__name__)
+
+start_time = time.time()
+alive = True
+
+@app.route("/health")
+def health():
+    if not alive:
+        return {"status": "down"}, 500
+    return {"status": "ok"}, 200
+
+@app.route("/kill")
+def kill():
+    global alive
+    alive = False
+    return {"status": "killed app"}, 200
+
+@app.route("/")
+def home():
+    return{"message": "app running"}, 200
+
 
 if __name__ == "__main__":
+
+    app.run(host="0.0.0.0", port=5000)
 
     s3_client = boto3.client(
         "s3",

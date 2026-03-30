@@ -3,3 +3,4 @@ matplotlib
 dominate
 dotenv
 boto3
+flask

@@ -18,13 +18,23 @@ spec:
         - name: url-monitor
           image: url-monitor:latest
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
 
           envFrom:
             - secretRef:
                 name: url-monitor-secret
 
           livenessProbe:
-            exec:
-              command: ["echo", "ok"]
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
             initialDelaySeconds: 5
             periodSeconds: 5
