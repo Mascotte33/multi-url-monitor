@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-monitor-worker
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url-monitor-worker
+
+  template:
+    metadata:
+      labels:
+        app: url-monitor-worker
+
+    spec:
+      containers:
+        - name: worker
+          image: url-monitor:latest
+          imagePullPolicy: IfNotPresent    
+          command: ["python", "worker.py"]
+          envFrom:
+            - secretRef:
+                name: url-monitor-secret
+
