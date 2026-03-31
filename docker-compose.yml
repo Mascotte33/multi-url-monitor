@@ -1,7 +1,8 @@
 services:
   app:
     # nazwa kontenera / serwisu
-    build: . # buduj z Dockerfile w aktualnym folderze
+    build: . # buduj image z Dockerfile w aktualnym folderze
+    image: url-monitor:latest
     container_name: url-monitor
     volumes:
       - .:/app # mount folderu lokalnego do kontenera
@@ -11,7 +12,7 @@ services:
     environment:
       URLS: ${URLS}
       INTERVAL: ${INTERVAL}
-    command: python main.py
+    command: python -m flask run --host=0.0.0.0 --port=5000 --debug
     restart: always
   web:
     image: nginx:alpine

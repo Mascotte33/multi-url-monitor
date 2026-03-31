@@ -222,6 +222,25 @@ app = Flask(__name__)
 
 start_time = time.time()
 alive = True
+ready = False
+
+@app.route("/ready")
+def check_ready():
+    if ready == True:
+        return {"status": "ready"}, 200
+    return {"status": "not ready"}, 503
+
+@app.route("/start")
+def start():
+    global ready
+    ready = True
+    return {"status": "ready enabled"}, 200
+
+@app.route("/stop")
+def stop():
+    global ready
+    ready = False
+    return {"status": "ready disabled"}, 200
 
 @app.route("/health")
 def health():
