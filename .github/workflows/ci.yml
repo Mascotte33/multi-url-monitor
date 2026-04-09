@@ -19,5 +19,5 @@ jobs:
        # install deps
       - run: pip install -r requirements.txt    
        # py_compile
-      - run: python -m py_compile worker.py api.py
+      - run: python -m py_compile src/worker.py src/api.py
        
