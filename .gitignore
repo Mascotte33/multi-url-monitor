@@ -1,11 +1,10 @@
-# Python cache
+# Python
 __pycache__/
 *.pyc
-# Generated logs and reports
-health_check.log
-summary_report.txt
-summary_report.html
-plots/
+venv/
+
+# Generated output
+output/
 
 # VS Code settings
 .vscode/
@@ -14,20 +13,14 @@ plots/
 .DS_Store
 Thumbs.db
 
-#environment
+# Environment secrets
 .env
 
-#minikube
+# Minikube binary
 minikube-linux-amd64
 
-#ai training agent
-*.md
-.github/agents/devops-mentor.agent.md
-
-#terraform
-terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/6.39.0/linux_amd64/LICENSE.txt
-terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/6.39.0/linux_amd64/terraform-provider-aws_v6.39.0_x5
+# Terraform
+terraform/.terraform/
 terraform/terraform.tfvars
 *.tfstate
 *.tfstate.backup
-.

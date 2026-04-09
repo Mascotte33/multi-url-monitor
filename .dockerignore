@@ -1,9 +1,14 @@
 plots/
+output/
 health_check.log
-summary_report.txt
-summary_report.html
+*.log
 __pycache__/
 *.pyc
-*.log
 .git
+.env
+venv/
+terraform/
+k8s/
+.github/
+.vscode/
 .env
