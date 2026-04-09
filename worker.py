@@ -218,7 +218,10 @@ def upload_to_s3(local_path, s3_path):
         logging.error(f"Failed to upload the file. {e}")
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":   
+
+    if os.path.exists('.env'):
+        load_dotenv('.env') #dzieki temu moge sie dostac do zmiennych w .env
 
     s3_client = boto3.client(
         "s3",
@@ -233,7 +236,6 @@ if __name__ == "__main__":
     OUTPUT_DIR = Path("output")
     OUTPUT_DIR.mkdir(parents=True,exist_ok=True)
 
-    load_dotenv('.env') #dzieki temu moge sie dostac do zmiennych w .env
 
     env_interval = os.getenv("INTERVAL")
     if env_interval == None:

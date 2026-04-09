@@ -20,14 +20,14 @@ Thumbs.db
 #minikube
 minikube-linux-amd64
 
-#terraform 
-*.tfstate
-*.tfstate.backup
-
 #ai training agent
-.md
+*.md
 .github/agents/devops-mentor.agent.md
 
 #terraform
 terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/6.39.0/linux_amd64/LICENSE.txt
 terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/6.39.0/linux_amd64/terraform-provider-aws_v6.39.0_x5
+terraform/terraform.tfvars
+*.tfstate
+*.tfstate.backup
+.
