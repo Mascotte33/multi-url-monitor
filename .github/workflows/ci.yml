@@ -22,5 +22,5 @@ jobs:
       - run: python -m py_compile src/worker.py src/api.py
       # run tests
       - name: Run Tests
-        run: python3 -m pytest /tests -v
+        run: python3 -m pytest tests/ -v
        
