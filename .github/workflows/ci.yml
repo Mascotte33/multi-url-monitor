@@ -20,4 +20,7 @@ jobs:
       - run: pip install -r requirements.txt    
        # py_compile
       - run: python -m py_compile src/worker.py src/api.py
+      # run tests
+      - name: Run Tests
+        run: python -m pytest /tests -v
        
