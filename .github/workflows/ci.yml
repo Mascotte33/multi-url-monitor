@@ -24,6 +24,11 @@ jobs:
     needs: test
     if: github.event_name == 'push'              
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/url-monitor
+      run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+
     steps:
       -
         name: Actions Checkout
@@ -45,8 +50,8 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner | lower }}/url-monitor:latest
-            ghcr.io/${{ github.repository_owner | lower }}/url-monitor:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
             
         
 
