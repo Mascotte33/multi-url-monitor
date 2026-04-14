@@ -24,13 +24,13 @@ jobs:
     needs: test
     if: github.event_name == 'push'              
     runs-on: ubuntu-latest
-    # env:
-    #   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/url-monitor
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/url-monitor
       
     steps:
-      # -
-      #   name: Set the repository name to lowercase 
-      #   run: echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      -
+        name: Set the repository name to lowercase 
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       -
         name: Actions Checkout
@@ -51,11 +51,9 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/url-monitor:latest | tr '[:upper:]' '[:lower:]'
-            ghcr.io/${{ github.repository_owner }}/ulr-monitor:${{ github.sha }} | tr '[:upper:]' '[:lower:]'
-
-
+          tags: |          
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
             
         
 
