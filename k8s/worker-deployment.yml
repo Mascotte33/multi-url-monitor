@@ -24,4 +24,11 @@ spec:
           envFrom:
             - secretRef:
                 name: url-monitor-secret
+          resources:
+            requests:
+              memory: "350Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
 
