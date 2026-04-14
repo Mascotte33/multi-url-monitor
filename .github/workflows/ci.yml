@@ -24,6 +24,9 @@ jobs:
     needs: test
     if: github.event_name == 'push'              
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     env:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/url-monitor
       
