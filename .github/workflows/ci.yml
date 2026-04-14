@@ -30,7 +30,7 @@ jobs:
     steps:
       -
         name: Set the repository name to lowercase 
-        run: echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/url-monitor" >> $GITHUB_ENV
 
       -
         name: Actions Checkout
@@ -56,6 +56,5 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
             
         
-
 
 
