@@ -20,6 +20,7 @@ jobs:
       - name: Run Tests
         run: python3 -m pytest tests/ -v
 
+
   build:
     needs: test
     if: github.event_name == 'push'              
@@ -57,6 +58,35 @@ jobs:
           tags: |          
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'              
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+    env:
+      KUBECONFIG: kubeconfig.yml
+    steps: 
+      -
+        name: Install kubectl on runner
+        uses: azure/setup-kubectl@v4
+        with:
+          version: latest
+        id: install
+      -
+        name: Decode kubectlconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 --decode > kubeconfig.yml        
+      -
+        name: Update both deployments to the new image        
+        run: |
+          OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${OWNER}/url-monitor:${{ github.sha }}"
+          kubectl set image deployment/url-monitor-worker worker=$IMAGE -n url-monitor
+          kubectl set image deployment/url-monitor-api api=$IMAGE -n url-monitor
+
             
         
 
