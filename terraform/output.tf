@@ -1,8 +1,8 @@
 output "id" {
-  value     = aws_iam_access_key.access_key.id
+  value     = module.iam.access_id_key
   sensitive = true
 }
 output "secret" {
-  value     = aws_iam_access_key.access_key.secret
+  value     = module.iam.access_secret_key
   sensitive = true
 }

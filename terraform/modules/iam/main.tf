@@ -5,7 +5,7 @@ data "aws_iam_policy_document" "iam_policy" {
     actions = [
       "s3:PutObject"
     ]
-    resources = ["${aws_s3_bucket.s3_bucket.arn}/*"]
+    resources = ["${var.bucket_arn}/*"]
   }
 }
 
