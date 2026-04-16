@@ -27,3 +27,8 @@ module "iam" {
   source     = "./modules/iam"
   bucket_arn = module.s3.bucket_arn
 }
+
+module "monitoring" {
+  source      = "./modules/monitoring"
+  alert_email = var.alert_email
+}
