@@ -60,11 +60,13 @@ def log_level(response):
 def log_result(response, level, url):
     with open(OUTPUT_DIR/"health_check.log", "a") as log_file:
         if response['status'] == None:
-            log_file.write(
-                f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['error']} \n")
+            message = f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['error']} \n"
         else:
-            log_file.write(
-                f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['status']} Response time: {response['duration']:.2f}s \n")
+            message = f"{datetime.datetime.now():%Y-%m-%d_%H:%M:%S} {level} {url} Status: {response['status']} Response time: {response['duration']:.2f}s \n"           
+
+        log_file.write(message)
+        if level == 'ERROR':
+            send_to_cloudwatch(message)
 
 
 def run_monitor(url_list):
@@ -217,11 +219,48 @@ def upload_to_s3(local_path, s3_path):
     except Exception as e:
         logging.error(f"Failed to upload the file. {e}")
 
+def send_to_cloudwatch(message):
+    todaysDate = datetime.datetime.now().strftime("%Y-%m-%d")
+    groupName = '/url-monitor/worker'
+
+    try:
+        logs_client.create_log_stream(
+            logGroupName = groupName,
+            logStreamName = todaysDate        
+            )
+    except logs_client.exceptions.ResourceAlreadyExistsException:
+        pass
+
+    logs_client.put_log_events(
+        logGroupName= groupName,
+        logStreamName= todaysDate,
+        logEvents=[
+            {
+                'timestamp': int(time.time() * 1000),
+                'message': message 
+            }
+        ]
+    )
+        
+
+
+                
+
 
 if __name__ == "__main__":   
 
+
+
     if os.path.exists('.env'):
         load_dotenv('.env') #dzieki temu moge sie dostac do zmiennych w .env
+
+
+    logs_client = boto3.client(
+        "logs",
+        aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY"),
+        region_name = os.getenv("AWS_REGION")  
+    )
 
     s3_client = boto3.client(
         "s3",
