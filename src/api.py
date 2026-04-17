@@ -74,7 +74,7 @@ def monitor_urls():
                 url_response_time.labels(url=url).set(response_time)
              
             except requests.exceptions.RequestException as request_exception: url_up.labels(url=url).set(0) 
-
+        ready = True
         time.sleep(30)                    
 
 if __name__ == "__main__":
