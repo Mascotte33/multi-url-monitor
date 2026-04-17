@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
         - name: worker
-          image: url-monitor:latest
-          imagePullPolicy: IfNotPresent    
+          image: ghcr.io/mascotte33/url-monitor:latest
+          imagePullPolicy: Always
           command: ["python", "src/worker.py"]
           envFrom:
             - secretRef:

@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: api
-          image: url-monitor:latest
-          imagePullPolicy: Never
+          image: ghcr.io/mascotte33/url-monitor:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           command: ["python", "src/api.py"]
