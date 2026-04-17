@@ -18,6 +18,9 @@ spec:
         - name: api
           image: ghcr.io/mascotte33/url-monitor:latest
           imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: url-monitor-secret
           ports:
             - containerPort: 5000
           command: ["python", "src/api.py"]

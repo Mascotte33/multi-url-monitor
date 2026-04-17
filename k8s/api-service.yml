@@ -3,13 +3,16 @@ kind: Service
 metadata:
   name: url-monitor
   namespace: url-monitor
+  labels:
+    app: url-monitor-api
 
 spec:
   selector:
     app: url-monitor-api
 
   ports:
-    - protocol: TCP
+    - name: metrics
+      protocol: TCP
       port: 5000
       targetPort: 5000
 
